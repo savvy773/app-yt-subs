@@ -1,6 +1,10 @@
 {
-  "venvPath": "..",
+  "venvPath": ".",
   "venv": ".venv",
+  "extraPaths": [
+    ".venv/Lib/site-packages"
+  ],
+  "typeCheckingMode": "basic",
   "executionEnvironments": [
     {
       "root": "src"

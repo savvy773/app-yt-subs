@@ -1,23 +1,16 @@
-# Python environment
-.venv/
+# Python-generated files
 __pycache__/
-*.py[cod]
-*$py.class
-
-# Flet & PyInstaller Build artifacts
+*.py[oc]
 build/
 dist/
-*.spec
+wheels/
+*.egg-info
 
-# User Session & Private Data (IMPORTANT!)
-user_data/
-config.json
-subscriptions.csv
-*.log
+# env 
+.venv
+.vscode
 
-# IDE Settings (VS Code & PyCharm)
-.vscode/
-.idea/
+# root
+user_data
+*.csv
 
-# Local configuration
-pyrightconfig.json
