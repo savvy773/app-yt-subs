@@ -1,5 +1,7 @@
 # YouTube Subscriptions Manager 🚀 (Safe & Modern)
 
+![App Screenshot](images/screenshot.png)
+
 A powerful automation tool based on **Playwright + Flet (GUI)** to safely manage your YouTube subscriptions. 
 
 Easily backup hundreds of subscriptions, clear your account for a fresh start, and restore (import) them all at once. It features a **'Safe Mode'** with human-like delays to avoid account restrictions and a **'Background Mode'** for quiet execution.
@@ -60,6 +62,12 @@ uv run yt-subs
 1.  **Account Risk:** This tool uses automated means which are generally prohibited by YouTube's Terms of Service (ToS). Use of this tool may result in functional limits, temporary suspension, or permanent banning of your YouTube account. The developer is not responsible for any such consequences.
 2.  **Use Safe Mode:** YouTube's detection algorithms change frequently. Always use the built-in delays provided by this tool.
 3.  **Security Notice:** The `user_data` folder contains your active Google session. Never share this folder or upload it to public repositories like GitHub (it is already ignored by `.gitignore`).
+
+---
+
+## 👤 Author
+
+-   **savvy773** - [GitHub Profile](https://github.com/savvy773)
 
 ---
 

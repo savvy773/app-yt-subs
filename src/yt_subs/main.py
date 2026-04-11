@@ -2,23 +2,36 @@ import asyncio
 import csv
 import json
 import random
+import sys
+from typing import List, Any, cast
 import flet as ft
 from pathlib import Path
-from playwright.async_api import async_playwright
+from playwright.async_api import async_playwright, Playwright
 
-# Configuration Paths
-ROOT_DIR = Path("D:/Code/Python/yt_subs")
-USER_DATA_DIR = ROOT_DIR / "user_data"
-SUBS_FILE = ROOT_DIR / "subscriptions.csv"
-CONFIG_FILE = ROOT_DIR / "config.json"
+"""
+YouTube Subscriptions Manager
+Original Author: savvy773 (https://github.com/savvy773)
+License: MIT
+"""
+
+# --- Portable Path Logic ---
+if getattr(sys, 'frozen', False):
+    BASE_DIR = Path(sys.executable).parent
+else:
+    BASE_DIR = Path.cwd()
+
+USER_DATA_DIR = BASE_DIR / "user_data"
+SUBS_FILE = BASE_DIR / "subscriptions.csv"
+CONFIG_FILE = BASE_DIR / "config.json"
+# ---------------------------
 
 class YTManagerApp:
     def __init__(self, page: ft.Page):
         self.page = page
-        self.page.title = "YouTube Subscriptions Manager (Safe Mode) 🚀"
+        self.page.title = "YouTube Subscriptions Manager by savvy773 🚀"
         self.page.theme_mode = ft.ThemeMode.DARK
         
-        self.config = {"width": 600, "height": 800, "top": 100, "left": 100}
+        self.config = {"width": 600, "height": 850, "top": 100, "left": 100}
         self.load_config()
         self.apply_window_settings()
         
@@ -39,29 +52,41 @@ class YTManagerApp:
                 with open(CONFIG_FILE, "r") as f:
                     saved = json.load(f)
                     for k in self.config.keys():
-                        if k in saved and saved[k] is not None: self.config[k] = saved[k]
+                        if k in saved and saved[k] is not None: 
+                            self.config[k] = saved[k]
             except: pass
 
     def save_config(self):
         try:
-            w, h, t, l = self.page.window.width, self.page.window.height, self.page.window.top, self.page.window.left
+            w = self.page.window.width
+            h = self.page.window.height
+            t = self.page.window.top
+            l = self.page.window.left
+            
             if all(v is not None for v in [w, h, t, l]):
-                self.config.update({"width": w, "height": h, "top": t, "left": l})
-                with open(CONFIG_FILE, "w") as f: json.dump(self.config, f)
+                self.config["width"] = int(w) if w else 600
+                self.config["height"] = int(h) if h else 850
+                self.config["top"] = int(t) if t else 100
+                self.config["left"] = int(l) if l else 100
+                with open(CONFIG_FILE, "w", encoding="utf-8") as f:
+                    json.dump(self.config, f)
         except: pass
 
     def apply_window_settings(self):
-        self.page.window.width, self.page.window.height = self.config["width"], self.config["height"]
-        self.page.window.top, self.page.window.left = self.config["top"], self.config["left"]
+        self.page.window.width = self.config["width"]
+        self.page.window.height = self.config["height"]
+        self.page.window.top = self.config["top"]
+        self.page.window.left = self.config["left"]
         self.page.update()
 
-    async def on_window_event(self, e):
-        if e.data in ["moved", "resized"]: self.save_config()
+    async def on_window_event(self, e: ft.ControlEvent):
+        if e.data in ["moved", "resized"]:
+            self.save_config()
 
     def setup_ui(self):
-        header = ft.Column([
-            ft.Text("YouTube Subscriptions", size=32, weight="bold", color="blue"),
-            ft.Text("Safe & Automated Subscription Management.", color="white70", size=14),
+        header = ft.Column(controls=[
+            ft.Text("YouTube Subscriptions", size=32, weight=ft.FontWeight.BOLD, color="blue"),
+            ft.Text("Safe & Automated Management by savvy773", color="white70", size=14),
         ])
         
         options = ft.Container(
@@ -69,17 +94,26 @@ class YTManagerApp:
             padding=10,
             bgcolor="#222222",
             border_radius=10,
-            alignment=ft.alignment.center
+            alignment=ft.Alignment(0, 0)
         )
 
-        action_buttons = ft.Row([
-            ft.FilledButton("Export (Backup)", icon=ft.Icons.DOWNLOAD, on_click=self.on_export_click, style=ft.ButtonStyle(bgcolor="blue700", color="white")),
-            ft.FilledButton("Clear (Delete)", icon=ft.Icons.DELETE_FOREVER, on_click=self.on_clear_click, style=ft.ButtonStyle(bgcolor="red700", color="white")),
-            ft.FilledButton("Import (Restore)", icon=ft.Icons.UPLOAD, on_click=self.on_import_click, style=ft.ButtonStyle(bgcolor="green700", color="white")),
-        ], alignment=ft.MainAxisAlignment.CENTER, spacing=10)
+        action_buttons = ft.Row(
+            controls=cast(List[ft.Control], [
+                ft.FilledButton("Export (Backup)", icon=ft.Icons.DOWNLOAD, on_click=self.on_export_click, style=ft.ButtonStyle(bgcolor="blue700", color="white")),
+                ft.FilledButton("Clear (Delete)", icon=ft.Icons.DELETE_FOREVER, on_click=self.on_clear_click, style=ft.ButtonStyle(bgcolor="red700", color="white")),
+                ft.FilledButton("Import (Restore)", icon=ft.Icons.UPLOAD, on_click=self.on_import_click, style=ft.ButtonStyle(bgcolor="green700", color="white")),
+            ]),
+            alignment=ft.MainAxisAlignment.CENTER,
+            spacing=10
+        )
         
         log_container = ft.Container(
             content=self.log_area, bgcolor="#1A1A1A", border_radius=10, padding=10, expand=True, border=ft.Border.all(1, "#333333")
+        )
+        
+        footer = ft.Row(
+            controls=[ft.Text("© 2026 savvy773. All rights reserved.", size=11, color="white24")],
+            alignment=ft.MainAxisAlignment.CENTER
         )
         
         self.page.add(
@@ -87,14 +121,15 @@ class YTManagerApp:
             options, ft.Divider(height=10, color="transparent"),
             action_buttons, ft.Divider(height=30, color="#333333"),
             self.status_text, self.progress_bar, ft.Text("Real-time Logs", size=12, color="white40"),
-            log_container
+            log_container,
+            footer
         )
 
-    def log(self, message, color="white"):
+    def log(self, message: str, color: str = "white"):
         self.log_area.controls.append(ft.Text(message, color=color, size=13))
         self.page.update()
 
-    async def get_browser_context(self, p):
+    async def get_browser_context(self, p: Playwright):
         if not USER_DATA_DIR.exists(): USER_DATA_DIR.mkdir(parents=True)
         headless = self.bg_switch.value
         if headless:
@@ -109,12 +144,18 @@ class YTManagerApp:
             args=["--start-maximized", "--disable-blink-features=AutomationControlled", "--no-sandbox", "--disable-infobars"]
         )
 
-    async def human_delay(self, min_sec=2.5, max_sec=5.0):
+    async def human_delay(self, min_sec: float = 2.5, max_sec: float = 5.0):
         await asyncio.sleep(random.uniform(min_sec, max_sec))
 
-    async def ensure_logged_in_and_navigate(self, page, target_url):
+    async def ensure_logged_in_and_navigate(self, page, target_url: str):
         self.log("Checking Google environment...", "white60")
-        await page.goto("https://www.google.com")
+        try:
+            await page.goto("https://www.google.com")
+        except Exception:
+            self.log("❌ Error: Could not load browser. Make sure Chromium is installed.", "red")
+            self.log("Run 'playwright install chromium' in terminal.", "yellow")
+            raise
+
         await asyncio.sleep(2)
         await page.goto(target_url)
         
@@ -131,7 +172,7 @@ class YTManagerApp:
         else:
             self.log("✅ Login state verified.", "green")
 
-    async def on_export_click(self, e):
+    async def on_export_click(self, e: Any):
         self.log("--- Export Process Started ---", "blue")
         self.progress_bar.visible, self.progress_bar.value = True, None
         self.page.update()
@@ -167,8 +208,8 @@ class YTManagerApp:
         self.progress_bar.visible = False
         self.page.update()
 
-    async def on_clear_click(self, e):
-        async def start_clear(e):
+    async def on_clear_click(self, e: Any):
+        async def start_clear(e_clear: Any):
             confirm_dlg.open = False
             self.log("--- Unsubscribe Process Started ---", "red")
             self.progress_bar.visible = True
@@ -204,15 +245,16 @@ class YTManagerApp:
             self.progress_bar.visible = False
             self.page.update()
         
-        confirm_dlg = ft.AlertDialog(title=ft.Text("Confirm Mass Unsubscribe?"), actions=[
-            ft.TextButton("Confirm", on_click=start_clear, font_color="red"),
+        confirm_dlg_actions = cast(List[ft.Control], [
+            ft.TextButton("Confirm", on_click=start_clear, style=ft.ButtonStyle(color=ft.Colors.RED)),
             ft.TextButton("Cancel", on_click=lambda _: setattr(confirm_dlg, "open", False) or self.page.update()),
         ])
+        confirm_dlg = ft.AlertDialog(title=ft.Text("Confirm Mass Unsubscribe?"), actions=confirm_dlg_actions)
         self.page.overlay.append(confirm_dlg)
         confirm_dlg.open = True
         self.page.update()
 
-    async def on_import_click(self, e):
+    async def on_import_click(self, e: Any):
         if not SUBS_FILE.exists():
             self.log("Backup file (subscriptions.csv) not found!", "red")
             return
