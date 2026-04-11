@@ -1,68 +1,68 @@
 # YouTube Subscriptions Manager 🚀 (Safe & Modern)
 
-유튜브 구독 목록을 안전하고 편리하게 관리할 수 있는 **Playwright + Flet(GUI)** 기반의 자동화 도구입니다. 
+A powerful automation tool based on **Playwright + Flet (GUI)** to safely manage your YouTube subscriptions. 
 
-수백 개의 구독을 한꺼번에 백업하거나, 계정 정리를 위해 모든 구독을 취소하고, 다시 한 번에 복원(Import)하는 기능을 제공합니다. 특히 유튜브의 봇 감지 정책을 피하기 위한 **'안정 모드(Safe Mode)'**와 조용히 작업을 수행하는 **'백그라운드 모드'**가 탑재되어 있습니다.
-
----
-
-## ✨ 주요 기능 (Key Features)
-
--   **📥 백업 (Export):** 현재 구독 중인 모든 채널 목록을 `subscriptions.csv` 파일로 저장합니다.
--   **🗑️ 전체 삭제 (Clear):** 계정의 모든 구독을 취소합니다. (삭제 전 확인 절차 포함)
--   **📤 복원 (Import):** CSV 파일을 읽어 들여 자동으로 다시 구독 버튼을 누릅니다.
--   **🛡️ 안정 모드 (Safe Mode):** 인간의 행동 패턴을 흉내 낸 랜덤 지연(Human Delay)과 휴식 시간을 통해 유튜브의 계정 제재를 피합니다.
--   **👤 세션 유지:** 최초 1회 로그인 이후에는 `user_data`를 통해 자동으로 로그인 상태가 유지됩니다.
--   **🖥️ 백그라운드 모드:** 브라우저 창을 띄우지 않고 뒤에서 조용히 작업을 처리할 수 있습니다.
--   **📦 창 설정 기억:** 마지막에 사용한 앱의 창 위치와 크기를 자동으로 기억하여 복원합니다.
+Easily backup hundreds of subscriptions, clear your account for a fresh start, and restore (import) them all at once. It features a **'Safe Mode'** with human-like delays to avoid account restrictions and a **'Background Mode'** for quiet execution.
 
 ---
 
-## 🛠 설치 및 시작하기 (Installation)
+## ✨ Key Features
 
-이 프로젝트는 최신 파이썬 패키지 관리자인 **`uv`**를 사용합니다.
+-   **📥 Export (Backup):** Save all your currently subscribed channels to a `subscriptions.csv` file.
+-   **🗑️ Clear (Delete):** Mass unsubscribe from all channels with a safe confirmation step.
+-   **📤 Import (Restore):** Automatically re-subscribe to channels from a CSV backup.
+-   **🛡️ Safe Mode:** Mimics human behavior with random delays and periodic breaks to prevent YouTube account flags.
+-   **👤 Session Persistence:** Uses `user_data` to keep you logged in after the first manual authentication.
+-   **🖥️ Background Mode:** Run tasks silently without the browser window popping up.
+-   **📦 Window Persistence:** Automatically remembers and restores the last window position and size.
+
+---
+
+## 🛠 Installation
+
+This project uses **`uv`**, the modern Python package manager.
 
 ```powershell
-# 1. 의존성 설치
+# 1. Install dependencies
 uv sync
 
-# 2. 브라우저 엔진 설치 (최초 1회)
+# 2. Install browser engine (first time only)
 uv run playwright install chromium
 ```
 
 ---
 
-## 🚀 사용법 (Usage)
+## 🚀 Usage
 
-터미널에서 아래 명령어로 GUI 앱을 실행합니다:
+Run the GUI application from your terminal:
 ```powershell
 uv run yt-subs
 ```
 
-1.  **로그인:** 로그인이 필요한 경우 브라우저가 자동으로 멈춥니다. 로그인을 완료하면 작업이 자동으로 재개됩니다.
-2.  **안정 모드:** 모든 작업은 계정 보호를 위해 의도적으로 천천히 진행됩니다. (200개 채널 기준 약 20~30분 소요)
-3.  **백그라운드 모드:** 창이 자꾸 앞에 뜨는 것이 불편하다면 상단 스위치를 켜고 다른 작업을 진행하세요.
+1.  **Login:** If a login is required, the browser will pause automatically. Complete the login, and the automation will resume.
+2.  **Safe Mode:** All operations are intentionally slowed down for account protection (approx. 20-30 mins for 200 channels).
+3.  **Background Mode:** Use the toggle at the top if you want the browser to run hidden while you work on other tasks.
 
 ---
 
-## 📂 프로젝트 구조 (Project Structure)
+## 📂 Project Structure
 
--   `src/yt_subs/main.py`: 모든 자동화 로직과 GUI 인터페이스 (Flet & Playwright)
--   `pyproject.toml`: `uv` 프로젝트 설정 및 라이브러리 의존성
--   `config.json`: 창 위치 및 크기 설정 (자동 생성)
--   `subscriptions.csv`: 백업된 구독 정보 데이터 (자동 생성)
--   `user_data/`: 구글 로그인 세션 데이터 (로컬 보안용, **GitHub 절대 업로드 금지**)
-
----
-
-## ⚠️ 면책 조항 (Disclaimer) - 중요!
-
-1.  **계정 제재 위험:** 본 도구는 유튜브 서비스 약관(ToS)에서 금지하는 자동화된 수단을 사용합니다. 이 도구의 사용으로 인해 발생하는 유튜브 계정의 기능 제한, 일시 정지 또는 영구 정지에 대한 모든 책임은 **사용자 본인**에게 있습니다. 개발자는 어떠한 법적 책임도 지지 않습니다.
-2.  **안정 모드 권장:** 유튜브의 감지 알고리즘은 수시로 변경됩니다. 반드시 본 도구에 포함된 지연 시간을 준수하여 사용하시기 바랍니다.
-3.  **보안 주의:** `user_data` 폴더는 본인의 구글 로그인 세션을 포함하고 있습니다. 이 폴더를 절대 타인에게 공유하거나 GitHub 같은 공용 저장소에 올리지 마세요. (이미 `.gitignore`에 등록되어 있습니다.)
+-   `src/yt_subs/main.py`: Core automation logic and GUI (Flet & Playwright).
+-   `pyproject.toml`: `uv` project configuration and dependencies.
+-   `config.json`: Window state settings (auto-generated).
+-   `subscriptions.csv`: Exported subscription data (auto-generated).
+-   `user_data/`: Google login session data (**DO NOT upload to GitHub**).
 
 ---
 
-## 📄 라이선스 (License)
+## ⚠️ Disclaimer
 
-본 프로젝트는 **MIT 라이선스**를 따릅니다. 자세한 내용은 `LICENSE` 파일을 참조하세요.
+1.  **Account Risk:** This tool uses automated means which are generally prohibited by YouTube's Terms of Service (ToS). Use of this tool may result in functional limits, temporary suspension, or permanent banning of your YouTube account. The developer is not responsible for any such consequences.
+2.  **Use Safe Mode:** YouTube's detection algorithms change frequently. Always use the built-in delays provided by this tool.
+3.  **Security Notice:** The `user_data` folder contains your active Google session. Never share this folder or upload it to public repositories like GitHub (it is already ignored by `.gitignore`).
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License**. See the `LICENSE` file for details.
