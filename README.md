@@ -20,17 +20,19 @@ Easily backup hundreds of subscriptions, clear your account for a fresh start, a
 
 ---
 
-## 🛠 Installation
+## 📦 Installation
 
-This project uses **`uv`**, the modern Python package manager.
-
+**Windows (PowerShell)**
 ```powershell
-# 1. Install dependencies
-uv sync
-
-# 2. Install browser engine (first time only)
-uv run playwright install chromium
+irm https://github.com/savvy773/app-yt-subs-manager/releases/latest/download/install.ps1 | iex
 ```
+
+**Linux / macOS**
+```bash
+curl -fsSL https://github.com/savvy773/app-yt-subs-manager/releases/latest/download/install.sh | bash
+```
+
+The installer fetches `manifest.json`, downloads the binary, and verifies the **Blake3** hash before installing.
 
 ---
 

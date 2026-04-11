@@ -10,8 +10,11 @@ dependencies = [
     "typer>=0.24.1",
     "rich>=14.3.4",
     "flet-desktop>=0.84.0",
+    "pyinstaller>=6.19.0",
+    "blake3>=1.0.8",
 ]
 
 [tool.uv]
 managed = true
 workspace = { members = ["yt_subs", "others/*"] }
+
