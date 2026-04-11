@@ -21,19 +21,14 @@ user_data/
 subscriptions.csv
 config.json
 
+
 # Scripts (Local only)
 scripts/
 
+
 # Logs & Temp files
 *.log
-*.txt
-*.spec
-out.txt
-tracked_files.txt
-tracked_files_v2.txt
-import_flet_test.txt
-flet_pack_test.txt
-flet_exe_test.txt
+
 
 # Environment variables
 .env
