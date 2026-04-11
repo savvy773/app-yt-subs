@@ -3,39 +3,25 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-# Project Root (D:\Code\Python\yt_subs)
+# Absolute Project Root (One level up from this script)
 PROJECT_ROOT = Path(__file__).parent.parent.absolute()
 
 def run_sync_push(custom_message=None):
-    # 1. Create automatic message with timestamp
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    
-    if custom_message:
-        commit_msg = f"{custom_message} ({timestamp})"
-    else:
-        # Default message as requested
-        commit_msg = f"sync to server, all files from project - {timestamp}"
+    commit_msg = f"{custom_message} ({timestamp})" if custom_message else f"sync to server - {timestamp}"
 
     try:
-        print(f"🚀 Starting forced sync to GitHub...")
-        print(f"📝 Message: {commit_msg}")
-        
-        # Step 1: git add .
+        print(f"🚀 [Standalone] Syncing to GitHub...")
         subprocess.run(["git", "add", "."], check=True, cwd=PROJECT_ROOT)
-
-        # Step 2: git commit -m "..."
-        # If there are no changes, commit might fail, so we handle it.
+        
         try:
             subprocess.run(["git", "commit", "-m", commit_msg], check=True, cwd=PROJECT_ROOT)
         except subprocess.CalledProcessError:
             print("ℹ️ No changes to commit.")
 
-        # Step 3: git push -f origin main
-        print("📤 Pushing forcefully (-f) to origin main...")
+        print("📤 Forced pushing to origin main...")
         subprocess.run(["git", "push", "-f", "origin", "main"], check=True, cwd=PROJECT_ROOT)
-
-        print("\n✅ Sync complete! GitHub is now identical to your local project.")
-        
+        print("\n✅ STANDALONE SYNC COMPLETE!")
     except Exception as e:
         print(f"\n❌ Sync failed: {e}")
 
