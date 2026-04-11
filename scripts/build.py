@@ -43,9 +43,9 @@ def run_build():
     try:
         print(f"🚀 Packing {tag} into standalone EXE...")
         
-        # We call flet via python module to bypass PATH/uv trampoline issues
+        # We call flet_cli.cli via python module
         process = subprocess.run([
-            python_exe, "-m", "flet", "pack", str(SOURCE_FILE),
+            python_exe, "-m", "flet_cli.cli", "pack", str(SOURCE_FILE),
             "--name", f"yt-subs-manager-{tag}"
         ], check=True, cwd=PROJECT_ROOT)
 
