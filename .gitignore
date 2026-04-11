@@ -13,6 +13,5 @@ wheels/
 # root
 scripts/
 user_data/
-.gitignore
 *.csv
 
