@@ -1,15 +1,23 @@
-# 가상 환경
+# Python environment
 .venv/
 __pycache__/
 *.py[cod]
+*$py.class
 
-# 사용자 데이터 및 세션 (절대 올리면 안 됨!)
+# Flet & PyInstaller Build artifacts
+build/
+dist/
+*.spec
+
+# User Session & Private Data (IMPORTANT!)
 user_data/
 config.json
-
-# 개인 데이터 파일
-*.csv
+subscriptions.csv
 *.log
 
-# VS Code 설정
+# IDE Settings (VS Code & PyCharm)
 .vscode/
+.idea/
+
+# Local configuration
+pyrightconfig.json
