@@ -37,7 +37,10 @@ class YTManagerApp:
         
         # UI Elements
         self.log_area = ft.ListView(expand=True, spacing=5, padding=10, auto_scroll=True)
-        self.progress_bar = ft.ProgressBar(width=500, color="blue", bgcolor="#222222", value=0, visible=False)
+        self.progress_bar = ft.ProgressBar(width=500, visible=False)
+        self.progress_bar.color = "blue"
+        self.progress_bar.bgcolor = "#222222"
+        self.progress_bar.value = 0
         self.status_text = ft.Text("Status: Waiting", color="white70")
         
         # Background Mode Switch
