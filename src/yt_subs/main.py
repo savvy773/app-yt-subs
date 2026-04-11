@@ -31,7 +31,7 @@ class YTManagerApp:
         self.page.title = "YouTube Subscriptions Manager by savvy773 🚀"
         self.page.theme_mode = ft.ThemeMode.DARK
         
-        self.config = {"width": 600, "height": 850, "top": 100, "left": 100}
+        self.config = {"width": 600, "height": 900, "top": 100, "left": 100}
         self.load_config()
         self.apply_window_settings()
         
@@ -65,7 +65,7 @@ class YTManagerApp:
             
             if all(v is not None for v in [w, h, t, l]):
                 self.config["width"] = int(w) if w else 600
-                self.config["height"] = int(h) if h else 850
+                self.config["height"] = int(h) if h else 900
                 self.config["top"] = int(t) if t else 100
                 self.config["left"] = int(l) if l else 100
                 with open(CONFIG_FILE, "w", encoding="utf-8") as f:
@@ -89,14 +89,27 @@ class YTManagerApp:
             ft.Text("Safe & Automated Management by savvy773", color="white70", size=14),
         ])
         
-        options = ft.Container(
-            content=self.bg_switch,
-            padding=10,
+        # Step 1: Authentication
+        # Replaced ElevatedButton with FilledButton to avoid DeprecationWarning
+        auth_section = ft.Container(
+            content=ft.Column([
+                ft.Text("Step 1: Authentication", size=16, weight=ft.FontWeight.BOLD),
+                ft.Row([
+                    ft.FilledButton(
+                        "Login / Check Session", 
+                        icon=ft.Icons.LOGIN, 
+                        on_click=self.on_login_click,
+                        style=ft.ButtonStyle(bgcolor=ft.Colors.GREY_800, color=ft.Colors.WHITE)
+                    ),
+                    self.bg_switch
+                ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN)
+            ]),
+            padding=15,
             bgcolor="#222222",
             border_radius=10,
-            alignment=ft.Alignment(0, 0)
         )
 
+        # Step 2: Actions
         action_buttons = ft.Row(
             controls=cast(List[ft.Control], [
                 ft.FilledButton("Export (Backup)", icon=ft.Icons.DOWNLOAD, on_click=self.on_export_click, style=ft.ButtonStyle(bgcolor="blue700", color="white")),
@@ -118,7 +131,8 @@ class YTManagerApp:
         
         self.page.add(
             header, ft.Divider(height=20, color="transparent"),
-            options, ft.Divider(height=10, color="transparent"),
+            auth_section, ft.Divider(height=10, color="transparent"),
+            ft.Text("Step 2: Subscriptions Management", size=16, weight=ft.FontWeight.BOLD),
             action_buttons, ft.Divider(height=30, color="#333333"),
             self.status_text, self.progress_bar, ft.Text("Real-time Logs", size=12, color="white40"),
             log_container,
@@ -129,9 +143,10 @@ class YTManagerApp:
         self.log_area.controls.append(ft.Text(message, color=color, size=13))
         self.page.update()
 
-    async def get_browser_context(self, p: Playwright):
+    async def get_browser_context(self, p: Playwright, force_visible: bool = False):
         if not USER_DATA_DIR.exists(): USER_DATA_DIR.mkdir(parents=True)
-        headless = self.bg_switch.value
+        headless = False if force_visible else self.bg_switch.value
+        
         if headless:
             self.log("💡 Background Mode: Running browser hidden.", "white60")
         
@@ -165,12 +180,34 @@ class YTManagerApp:
                 raise Exception("Login Required")
             
             self.log("⚠️ Login required. Please complete login in the browser window!", "yellow")
-            await page.wait_for_url(lambda url: "youtube.com/feed/channels" in url or "youtube.com/@" in url, timeout=0)
+            await page.wait_for_url(lambda url: "youtube.com" in url and "google.com" not in url, timeout=0)
             self.log("✅ Login confirmed! Resuming automation.", "green")
             await self.human_delay(3, 5)
             await page.goto(target_url)
         else:
             self.log("✅ Login state verified.", "green")
+
+    async def on_login_click(self, e: Any):
+        self.log("--- Login / Session Check ---", "blue")
+        try:
+            async with async_playwright() as p:
+                context = await self.get_browser_context(p, force_visible=True)
+                page = await context.new_page()
+                self.log("Opening YouTube...")
+                await page.goto("https://www.youtube.com/feed/channels")
+                
+                if "accounts.google.com" in page.url or await page.query_selector('a:has-text("Sign in"), a:has-text("로그인")'):
+                    self.log("⚠️ Not logged in. Please log in manually in the browser window.", "yellow")
+                    await page.wait_for_url(lambda url: "youtube.com" in url and "google.com" not in url, timeout=0)
+                    self.log("✅ Login successful!", "green")
+                else:
+                    self.log("✅ You are already logged in.", "green")
+                
+                await asyncio.sleep(2)
+                await context.close()
+                self.log("Browser closed. You can now use Background Mode.", "white60")
+        except Exception as ex:
+            self.log(f"Login failed or cancelled: {ex}", "red")
 
     async def on_export_click(self, e: Any):
         self.log("--- Export Process Started ---", "blue")
@@ -229,13 +266,14 @@ class YTManagerApp:
                                 await asyncio.sleep(random.uniform(1, 2))
                                 await btn.click()
                                 confirm = await page.wait_for_selector('yt-button-renderer:has-text("Unsubscribe"), yt-button-renderer:has-text("구독 취소")', timeout=5000)
-                                await confirm.click()
-                                count += 1
-                                self.log(f"Unsubscribed ({count})...")
-                                await self.human_delay(3.5, 6.5)
-                                if count % 10 == 0:
-                                    self.log("Safe break for account protection...", "white60")
-                                    await self.human_delay(10, 15)
+                                if confirm:
+                                    await confirm.click()
+                                    count += 1
+                                    self.log(f"Unsubscribed ({count})...")
+                                    await self.human_delay(3.5, 6.5)
+                                    if count % 10 == 0:
+                                        self.log("Safe break for account protection...", "white60")
+                                        await self.human_delay(10, 15)
                             except: continue
                         await page.reload()
                         await self.human_delay(4, 7)
@@ -273,20 +311,22 @@ class YTManagerApp:
                     self.page.update()
                     try:
                         await page.goto(row['URL'])
-                        if i == 0 and ("accounts.google.com" in page.url or await page.query_selector('a:has-text("Sign in")')):
+                        if i == 0 and ("accounts.google.com" in page.url or await page.query_selector('a:has-text("Sign in"), a:has-text("로그인")')):
                             if self.bg_switch.value: raise Exception("Login Required")
                             self.log("⚠️ Login required.", "yellow")
                             await page.wait_for_url(lambda url: "youtube.com" in url and "google.com" not in url, timeout=0)
                             await page.goto(row['URL'])
                         
                         btn = await page.wait_for_selector('button:has-text("Subscribe"), button:has-text("구독")', timeout=5000)
-                        if "Subscribed" not in await btn.inner_text() and "구독중" not in await btn.inner_text():
-                            await btn.click()
-                            self.log(f"✅ Subscribed: {row['Name']}")
-                            await self.human_delay(5, 8)
-                        else:
-                            self.log(f"Already Subscribed: {row['Name']}", "white60")
-                            await self.human_delay(2, 3)
+                        if btn:
+                            btn_text = await btn.inner_text()
+                            if "Subscribed" not in btn_text and "구독중" not in btn_text:
+                                await btn.click()
+                                self.log(f"✅ Subscribed: {row['Name']}")
+                                await self.human_delay(5, 8)
+                            else:
+                                self.log(f"Already Subscribed: {row['Name']}", "white60")
+                                await self.human_delay(2, 3)
                         if (i + 1) % 5 == 0:
                             self.log("Safe break for account protection...", "white60")
                             await self.human_delay(8, 12)
