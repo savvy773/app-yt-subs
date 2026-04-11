@@ -5,13 +5,31 @@ build/
 dist/
 wheels/
 *.egg-info
+*.spec
 
-# env 
+# Virtual Environment
 .venv/
+venv/
+ENV/
+
+# IDE Settings
 .vscode/
+.idea/
 
-# root
-scripts/
+# Application Data & Credentials
 user_data/
-*.csv
+subscriptions.csv
+config.json
 
+# Logs
+*.log
+import_flet_test.txt
+flet_pack_test.txt
+flet_exe_test.txt
+out.txt
+tracked_files.txt
+pyi_out.txt
+pyright_out.txt
+
+# Environment variables
+.env
