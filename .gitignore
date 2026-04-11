@@ -7,11 +7,11 @@ wheels/
 *.egg-info
 
 # env 
-.venv
-.vscode
+.venv/
+.vscode/
 
 # root
-scripts
-user_data
+scripts/
+user_data/
 *.csv
 
