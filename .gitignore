@@ -1,41 +1,40 @@
-# Python-generated files
+# Python generated files
 __pycache__/
 *.py[oc]
+*.egg-info
+*.spec
 build/
 dist/
 wheels/
-*.egg-info
-*.spec
 
 # Build cache
 .build-cache/
-
-# Virtual Environment
-.venv/
-venv/
-ENV/
-
-# IDE Settings
-.vscode/
-.idea/
-
-# Application Data & Credentials
-user_data/
-subscriptions.csv
-config.json
-
-
-# PyInstaller (no longer used)
 .pyinstaller/
 
-# Logs & Temp files
-*.log
+# Virtual environments
+.venv/
+ENV/
+venv/
 
+# IDE settings
+.idea/
+.vscode/
+
+# Application data and credentials
+config.json
+subscriptions.csv
+user_data/
+
+# Logs and temporary files
+*.log
 
 # Environment variables
 .env
 
-# md
+# Project notes
 claude.md
 gemini.md
+
+scripts/
+user_data/
 
