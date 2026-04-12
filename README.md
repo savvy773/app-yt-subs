@@ -54,28 +54,15 @@ curl -fsSL https://github.com/savvy773/app-yt-subs-manager/releases/latest/downl
 ## 🚀 Workflow
 
 ```mermaid
-flowchart TD
-    A([$ yt-subs]) --> B[Login / Check Session]
-    B --> C[Browser opens]
-    C --> D[Sign in to Google manually]
-    D --> E[(Session saved to user_data/)]
+flowchart LR
+    A([yt-subs]) --> B{Logged in?}
+    B -->|No| C[Sign in to Google] --> D[(user_data/)]
+    B -->|Yes| E{Action}
+    D --> E
 
-    E --> F{Choose Action}
-
-    F -->|📥 Export| G[Open YouTube Subscriptions]
-    G --> H[Scroll & scrape channel names]
-    H --> I[(Save to subscriptions.csv)]
-
-    F -->|🗑️ Clear| J[Confirm prompt]
-    J --> K[Unsubscribe from all channels]
-    K --> L([Done ✅])
-
-    F -->|📤 Import| M[Read subscriptions.csv]
-    M --> N[Visit each channel URL]
-    N --> O[Click Subscribe]
-    O --> L
-
-    I --> L
+    E -->|Export| F[Scrape YouTube] --> G[(subscriptions.csv)]
+    E -->|Clear| H[Unsubscribe all]
+    E -->|Import| I[Read CSV → Subscribe]
 ```
 
 ---
