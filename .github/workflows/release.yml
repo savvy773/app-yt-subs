@@ -1,8 +1,8 @@
 name: Release
 
 on:
-  push:
-    tags: ['v*.*.*']
+  release:
+    types: [published]
 
 permissions:
   contents: write
@@ -17,9 +17,9 @@ jobs:
       - name: Build wheel
         run: uv build --wheel
 
-      - name: Compute blake3 & generate manifest.json
+      - name: Compute blake3 and generate manifest.json
         env:
-          TAG: ${{ github.ref_name }}
+          TAG: ${{ github.event.release.tag_name }}
           REPO: ${{ github.repository }}
         run: |
           WHEEL=$(ls dist/*.whl)
@@ -55,19 +55,18 @@ jobs:
               json.dump(data, f, indent=2)
           "
 
-      - name: Create GitHub Release
+      - name: Upload wheel and manifest to release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create "${{ github.ref_name }}" \
+          gh release upload "${{ github.event.release.tag_name }}" \
             dist/*.whl \
             manifest.json \
-            --title "Release ${{ github.ref_name }}" \
-            --generate-notes
+            --clobber
 
   upload-installers:
     needs: build-release
     uses: savvy773/.github/.github/workflows/upload-installers.yml@main
     with:
-      tag: ${{ github.ref_name }}
+      tag: ${{ github.event.release.tag_name }}
     secrets: inherit
