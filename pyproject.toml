@@ -1,6 +1,6 @@
 [project]
 name = "yt-subs"
-version = "1.0.2"
+version = "1.0.3"
 description = "YouTube Subscriptions Manager - Safe & Automated GUI"
 authors = [{ name = "savvy773" }]
 readme = "README.md"
