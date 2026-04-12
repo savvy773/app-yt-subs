@@ -102,5 +102,7 @@ Write-Host "Installation complete!" -ForegroundColor Cyan
 Write-Host "  Run with : yt-subs"
 Write-Host "  Location : $toolBin\yt-subs.exe"
 Write-Host ""
-Write-Host "If 'yt-subs' is not found, add the following to your PATH:" -ForegroundColor Yellow
-Write-Host "  $toolBin" -ForegroundColor Yellow
+if ($env:PATH -notlike "*$toolBin*") {
+    Write-Host "Add the following to your PATH:" -ForegroundColor Yellow
+    Write-Host "  $toolBin" -ForegroundColor Yellow
+}

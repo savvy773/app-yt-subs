@@ -14,16 +14,15 @@ Original Author: savvy773 (https://github.com/savvy773)
 License: MIT
 """
 
-# --- Portable Path Logic ---
-if getattr(sys, 'frozen', False):
-    BASE_DIR = Path(sys.executable).parent
-else:
-    BASE_DIR = Path.cwd()
+# --- App Data Paths ---
+import os
+APP_DATA_DIR  = Path(os.environ.get("APPDATA", Path.home())) / "yt-subs"
+APP_DATA_DIR.mkdir(parents=True, exist_ok=True)
 
-USER_DATA_DIR = BASE_DIR / "user_data"
-SUBS_FILE = BASE_DIR / "subscriptions.csv"
-CONFIG_FILE = BASE_DIR / "config.json"
-# ---------------------------
+USER_DATA_DIR = APP_DATA_DIR / "user_data"
+SUBS_FILE     = APP_DATA_DIR / "subscriptions.csv"
+CONFIG_FILE   = APP_DATA_DIR / "config.json"
+# ----------------------
 
 class YTManagerApp:
     def __init__(self, page: ft.Page):
