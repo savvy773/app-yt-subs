@@ -31,10 +31,6 @@ user_data/
 # Environment variables
 .env
 
-# Project notes
-claude.md
-gemini.md
-
 scripts/
 user_data/
 
