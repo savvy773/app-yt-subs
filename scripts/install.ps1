@@ -78,7 +78,6 @@ $iconUrl      = "https://github.com/savvy773/app-yt-subs-manager/releases/latest
 $iconPath     = "$toolBin\yt-subs.ico"
 $desktopPath  = [Environment]::GetFolderPath("Desktop")
 $shortcutPath = Join-Path $desktopPath "$APP_NAME.lnk"
-
 try {
     Invoke-WebRequest -Uri $iconUrl -OutFile $iconPath -UseBasicParsing -ErrorAction Stop
 } catch {
