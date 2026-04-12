@@ -55,18 +55,13 @@ jobs:
               json.dump(data, f, indent=2)
           "
 
-      - name: Upload wheel and manifest to release
+      - name: Upload all assets to release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release upload "${{ github.event.release.tag_name }}" \
-            dist/*.whl \
-            manifest.json \
-            --clobber
-
-  upload-installers:
-    needs: build-release
-    uses: savvy773/.github/.github/workflows/upload-installers.yml@main
-    with:
-      tag: ${{ github.event.release.tag_name }}
-    secrets: inherit
+          files=()
+          files+=(dist/*.whl manifest.json)
+          [[ -f scripts/install.ps1 ]] && files+=(scripts/install.ps1)
+          [[ -f scripts/install.sh ]]  && files+=(scripts/install.sh)
+          [[ -f images/icon.ico ]] && files+=(images/icon.ico)
+          gh release upload "${{ github.event.release.tag_name }}" "${files[@]}" --clobber

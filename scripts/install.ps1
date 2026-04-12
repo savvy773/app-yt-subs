@@ -1,6 +1,8 @@
 # YouTube Subscriptions Manager - Windows Installer
 # Usage: irm https://github.com/savvy773/app-yt-subs-manager/releases/latest/download/install.ps1 | iex
 
+$ErrorActionPreference = 'Continue'
+
 $MANIFEST_URL = "https://github.com/savvy773/app-yt-subs-manager/releases/latest/download/manifest.json"
 $APP_NAME     = "YouTube Subscriptions Manager"
 $toolBin      = "$env:USERPROFILE\.local\bin"
