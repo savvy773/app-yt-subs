@@ -1,0 +1,73 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*.*.*']
+
+permissions:
+  contents: write
+
+jobs:
+  build-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+
+      - name: Build wheel
+        run: uv build --wheel
+
+      - name: Compute blake3 & generate manifest.json
+        env:
+          TAG: ${{ github.ref_name }}
+          REPO: ${{ github.repository }}
+        run: |
+          WHEEL=$(ls dist/*.whl)
+          WHEEL_NAME=$(basename "$WHEEL")
+          VERSION="${TAG#v}"
+
+          HASH=$(uv run --with blake3 --no-project python3 -c "
+          import blake3, sys
+          h = blake3.blake3()
+          with open(sys.argv[1], 'rb') as f:
+              for chunk in iter(lambda: f.read(1048576), b''):
+                  h.update(chunk)
+          print(h.hexdigest())
+          " "$WHEEL")
+
+          export WHEEL_NAME VERSION HASH
+          python3 -c "
+          import json, os
+          tag  = os.environ['TAG']
+          repo = os.environ['REPO']
+          wheel   = os.environ['WHEEL_NAME']
+          version = os.environ['VERSION']
+          h       = os.environ['HASH']
+          data = {
+              'version': version,
+              'assets': {'wheel': {
+                  'url': f'https://github.com/{repo}/releases/download/{tag}/{wheel}',
+                  'filename': wheel,
+                  'blake3': h,
+              }},
+          }
+          with open('manifest.json', 'w') as f:
+              json.dump(data, f, indent=2)
+          "
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${{ github.ref_name }}" \
+            dist/*.whl \
+            manifest.json \
+            --title "Release ${{ github.ref_name }}" \
+            --generate-notes
+
+  upload-installers:
+    needs: build-release
+    uses: savvy773/.github/.github/workflows/upload-installers.yml@main
+    with:
+      tag: ${{ github.ref_name }}
+    secrets: inherit
