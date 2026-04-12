@@ -53,32 +53,29 @@ curl -fsSL https://github.com/savvy773/app-yt-subs-manager/releases/latest/downl
 
 ## 🚀 Workflow
 
-```
-┌─────────────────────────────────────────────────────┐
-│                  First-time Setup                   │
-│                                                     │
-│   $ yt-subs                                         │
-│        │                                            │
-│        ▼                                            │
-│   Click "Login / Check Session"                     │
-│        │                                            │
-│        ▼                                            │
-│   Browser opens → Sign in to Google manually        │
-│        │                                            │
-│        ▼                                            │
-│   Session saved to user_data/ ✅                    │
-└─────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A([$ yt-subs]) --> B[Login / Check Session]
+    B --> C[Browser opens]
+    C --> D[Sign in to Google manually]
+    D --> E[(Session saved to user_data/)]
 
-┌──────────────────────────────────────────────────────┐
-│                Backup & Restore Flow                 │
-│                                                      │
-│   📥 Export          📤 Import                       │
-│   ────────           ────────                        │
-│   Open YouTube  →    Read subscriptions.csv          │
-│   Scroll page   →    Visit each channel URL          │
-│   Scrape names  →    Click Subscribe                 │
-│   Save CSV      →    Done ✅                         │
-└──────────────────────────────────────────────────────┘
+    E --> F{Choose Action}
+
+    F -->|📥 Export| G[Open YouTube Subscriptions]
+    G --> H[Scroll & scrape channel names]
+    H --> I[(Save to subscriptions.csv)]
+
+    F -->|🗑️ Clear| J[Confirm prompt]
+    J --> K[Unsubscribe from all channels]
+    K --> L([Done ✅])
+
+    F -->|📤 Import| M[Read subscriptions.csv]
+    M --> N[Visit each channel URL]
+    N --> O[Click Subscribe]
+    O --> L
+
+    I --> L
 ```
 
 ---
