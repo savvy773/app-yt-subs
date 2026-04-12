@@ -45,6 +45,7 @@ class YTManagerApp:
         # Background Mode Switch
         self.bg_switch = ft.Switch(label="Background Mode (Hide Browser)", value=False, label_position=ft.LabelPosition.LEFT)
         
+        self.page.window.prevent_close = True
         self.page.window.on_event = self.on_window_event
         self.setup_ui()
 
@@ -82,7 +83,10 @@ class YTManagerApp:
         self.page.update()
 
     async def on_window_event(self, e: ft.ControlEvent):
-        if e.data in ["moved", "resized"]:
+        if e.data == "close":
+            self.save_config()
+            self.page.window.destroy()
+        elif e.data in ["moved", "resized", "move", "resize"]:
             self.save_config()
 
     def setup_ui(self):
