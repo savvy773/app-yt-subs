@@ -11,7 +11,7 @@ from playwright.async_api import async_playwright, Playwright
 """
 YouTube Subscriptions Manager
 Original Author: savvy773 (https://github.com/savvy773)
-License: MIT
+License: Apache License 2.0
 """
 
 # --- App Data Paths ---
@@ -27,7 +27,7 @@ CONFIG_FILE   = APP_DATA_DIR / "config.json"
 class YTManagerApp:
     def __init__(self, page: ft.Page):
         self.page = page
-        self.page.title = "YouTube Subscriptions Manager by savvy773"
+        self.page.title = "YouTube Subscriptions Manager"
         self.page.theme_mode = ft.ThemeMode.DARK
         
         self.config = {"width": 600, "height": 900, "top": 100, "left": 100}
@@ -45,6 +45,7 @@ class YTManagerApp:
         # Background Mode Switch
         self.bg_switch = ft.Switch(label="Background Mode (Hide Browser)", value=False, label_position=ft.LabelPosition.LEFT)
         
+        self.page.window.on_event = self.on_window_event
         self.setup_ui()
 
     def load_config(self):
@@ -80,10 +81,8 @@ class YTManagerApp:
         self.page.window.left = self.config["left"]
         self.page.update()
 
-    async def _auto_save_loop(self):
-        """Save window position and size every 2 seconds in the background."""
-        while True:
-            await asyncio.sleep(2)
+    async def on_window_event(self, e: ft.ControlEvent):
+        if e.data in ["moved", "resized", "move", "resize", "close"]:
             self.save_config()
 
     def setup_ui(self):
@@ -346,7 +345,6 @@ async def main(page: ft.Page):
     app_instance = YTManagerApp(page)
     await asyncio.sleep(0.1)
     app_instance.apply_window_settings()
-    asyncio.create_task(app_instance._auto_save_loop())
 
 def app():
     ft.run(main)

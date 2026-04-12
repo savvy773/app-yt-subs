@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YT Subs Manager</title>
+  <style>
+    :root {
+      --bg:        #0d0d0d;
+      --surface:   #141414;
+      --card:      #1a1a1a;
+      --border:    #2a2a2a;
+      --accent:    #eb2525;
+      --accent2:   #db5656;
+      --text:      #f0f0f0;
+      --muted:     #888;
+      --green:     #22c55e;
+      --blue:      #3b82f6;
+      --yellow:    #eab308;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      line-height: 1.6;
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(13,13,13,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 56px;
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .nav-logo svg { color: var(--accent); }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: .9rem;
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+
+    /* ── Hero ── */
+    .hero {
+      min-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 4rem 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255,0,0,.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,0,0,.1);
+      border: 1px solid rgba(255,0,0,.25);
+      color: var(--accent2);
+      font-size: .78rem;
+      font-weight: 600;
+      padding: .3rem .8rem;
+      border-radius: 999px;
+      margin-bottom: 1.5rem;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+    .hero h1 {
+      font-size: clamp(2.4rem, 6vw, 4.5rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -.02em;
+      max-width: 780px;
+    }
+    .hero h1 span { color: var(--accent); }
+    .hero p {
+      margin-top: 1.25rem;
+      color: var(--muted);
+      font-size: 1.15rem;
+      max-width: 520px;
+    }
+    .hero-actions {
+      margin-top: 2.5rem;
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: .75rem 1.6rem;
+      border-radius: 8px;
+      font-size: .95rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all .2s;
+      cursor: pointer;
+      border: none;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+    .btn-primary:hover { background: var(--accent2); transform: translateY(-1px); }
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+    .btn-ghost:hover { border-color: var(--muted); transform: translateY(-1px); }
+
+    .install-block {
+      margin-top: 3rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.75rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      max-width: 680px;
+      width: 100%;
+    }
+    .install-label {
+      color: var(--muted);
+      font-size: .78rem;
+      white-space: nowrap;
+      font-weight: 600;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+    .install-cmd {
+      flex: 1;
+      font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+      font-size: .85rem;
+      color: var(--green);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .copy-btn {
+      background: var(--border);
+      border: none;
+      color: var(--muted);
+      padding: .4rem .8rem;
+      border-radius: 6px;
+      font-size: .8rem;
+      cursor: pointer;
+      transition: all .2s;
+      white-space: nowrap;
+    }
+    .copy-btn:hover { background: #333; color: var(--text); }
+
+    /* ── Section ── */
+    section { padding: 5rem 2rem; max-width: 1100px; margin: 0 auto; }
+    .section-label {
+      font-size: .78rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: .75rem;
+    }
+    .section-title {
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      font-weight: 800;
+      letter-spacing: -.02em;
+      margin-bottom: .75rem;
+    }
+    .section-sub {
+      color: var(--muted);
+      font-size: 1.05rem;
+      max-width: 540px;
+      margin-bottom: 3rem;
+    }
+
+    /* ── Feature grid ── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.25rem;
+    }
+    .feature-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.75rem;
+      transition: border-color .2s, transform .2s;
+    }
+    .feature-card:hover { border-color: #444; transform: translateY(-2px); }
+    .feature-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      margin-bottom: 1rem;
+    }
+    .feature-card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: .5rem; }
+    .feature-card p  { color: var(--muted); font-size: .9rem; line-height: 1.6; }
+
+    /* ── Usage steps ── */
+    .steps { display: flex; flex-direction: column; gap: 1rem; }
+    .step {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.5rem 1.75rem;
+      display: flex;
+      gap: 1.25rem;
+      align-items: flex-start;
+      transition: border-color .2s;
+    }
+    .step:hover { border-color: #444; }
+    .step-num {
+      min-width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(255,0,0,.12);
+      border: 1px solid rgba(255,0,0,.25);
+      color: var(--accent2);
+      font-weight: 800;
+      font-size: .9rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 2px;
+    }
+    .step-content h3 { font-size: 1rem; font-weight: 700; margin-bottom: .35rem; }
+    .step-content p  { color: var(--muted); font-size: .9rem; }
+    .step-content code {
+      background: #222;
+      color: var(--green);
+      padding: .15rem .45rem;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: .85rem;
+    }
+    .tag {
+      display: inline-block;
+      padding: .2rem .6rem;
+      border-radius: 5px;
+      font-size: .75rem;
+      font-weight: 600;
+      margin-left: .5rem;
+      vertical-align: middle;
+    }
+    .tag-warn { background: rgba(234,179,8,.15); color: var(--yellow); }
+    .tag-info { background: rgba(59,130,246,.15); color: var(--blue); }
+
+    /* ── Tech spec table ── */
+    .spec-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.25rem;
+    }
+    .spec-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .spec-card-header {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      font-weight: 700;
+      font-size: .9rem;
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      font-size: .78rem;
+    }
+    .spec-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: .85rem 1.5rem;
+      border-bottom: 1px solid #1f1f1f;
+      font-size: .9rem;
+    }
+    .spec-row:last-child { border-bottom: none; }
+    .spec-key { color: var(--muted); }
+    .spec-val { font-weight: 600; font-family: monospace; font-size: .85rem; }
+    .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 6px;
+    }
+    .dot-green  { background: var(--green); }
+    .dot-blue   { background: var(--blue); }
+    .dot-yellow { background: var(--yellow); }
+    .dot-red    { background: var(--accent); }
+
+    /* ── Install section ── */
+    .install-steps { display: flex; flex-direction: column; gap: .75rem; }
+    .install-step {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+    .install-step-icon { font-size: 1.3rem; min-width: 28px; text-align: center; }
+    .install-step p { font-size: .9rem; color: var(--muted); margin-top: .15rem; }
+    .install-step h4 { font-size: .95rem; font-weight: 700; }
+
+    pre {
+      background: #0a0a0a;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+      overflow-x: auto;
+      font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+      font-size: .85rem;
+      line-height: 1.7;
+      margin-top: 1rem;
+    }
+    .c-green  { color: var(--green); }
+    .c-muted  { color: var(--muted); }
+    .c-yellow { color: var(--yellow); }
+    .c-blue   { color: var(--blue); }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2.5rem 2rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: .875rem;
+    }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    /* ── Divider ── */
+    .divider { border: none; border-top: 1px solid var(--border); margin: 0; }
+
+    @media (max-width: 600px) {
+      .nav-links { display: none; }
+      .install-block { flex-direction: column; align-items: flex-start; }
+      .install-cmd { font-size: .78rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav>
+  <a class="nav-logo" href="#">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M21.582 6.186A2.506 2.506 0 0 0 19.82 4.42C18.28 4 12 4 12 4s-6.28 0-7.82.42a2.506 2.506 0 0 0-1.762 1.766C2 7.728 2 12 2 12s0 4.272.418 5.814a2.506 2.506 0 0 0 1.762 1.766C5.72 20 12 20 12 20s6.28 0 7.82-.42a2.506 2.506 0 0 0 1.762-1.766C22 16.272 22 12 22 12s0-4.272-.418-5.814zM10 15.464V8.536L15.818 12 10 15.464z"/>
+    </svg>
+    YT Subs Manager
+  </a>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#usage">Usage</a></li>
+    <li><a href="#install">Install</a></li>
+    <li><a href="#specs">Tech Specs</a></li>
+    <li><a href="https://github.com/savvy773/app-yt-subs-manager" target="_blank">GitHub</a></li>
+  </ul>
+</nav>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="badge">
+    <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor"><circle cx="5" cy="5" r="5"/></svg>
+    Free &amp; Open Source
+  </div>
+  <h1>Manage Your YouTube<br/><span>Subscriptions</span> Effortlessly</h1>
+  <p>Back up, restore, and bulk-unsubscribe from YouTube channels — fully automated with a clean GUI.</p>
+  <div class="hero-actions">
+    <a class="btn btn-primary" href="#install">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Install Now
+    </a>
+    <a class="btn btn-ghost" href="https://github.com/savvy773/app-yt-subs-manager" target="_blank">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>
+      View on GitHub
+    </a>
+  </div>
+  <div class="install-block">
+    <span class="install-label">PowerShell</span>
+    <span class="install-cmd" id="install-cmd">irm https://github.com/savvy773/app-yt-subs-manager/releases/latest/download/install.ps1 | iex</span>
+    <button class="copy-btn" onclick="copyCmd()">Copy</button>
+  </div>
+</div>
+
+<hr class="divider"/>
+
+<!-- Features -->
+<section id="features">
+  <div class="section-label">What it does</div>
+  <h2 class="section-title">Everything you need<br/>for subscription management</h2>
+  <p class="section-sub">One-click export, restore, and mass unsubscribe — with human-like delays to protect your account.</p>
+  <div class="features-grid">
+
+    <div class="feature-card">
+      <div class="feature-icon" style="background:rgba(34,197,94,.1)">📤</div>
+      <h3>Export (Backup)</h3>
+      <p>Scrapes all your subscribed channels and saves them to a <code style="background:#222;color:#22c55e;padding:.1rem .35rem;border-radius:4px;font-size:.82rem">subscriptions.csv</code> file for safekeeping.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon" style="background:rgba(239,68,68,.1)">🗑️</div>
+      <h3>Clear (Bulk Unsubscribe)</h3>
+      <p>Automatically unsubscribes from every channel with human-like delays and periodic safe-breaks to avoid account flags.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon" style="background:rgba(59,130,246,.1)">📥</div>
+      <h3>Import (Restore)</h3>
+      <p>Re-subscribes to all channels in your CSV backup with progress tracking and per-channel status logging.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon" style="background:rgba(168,85,247,.1)">🕶️</div>
+      <h3>Background Mode</h3>
+      <p>Toggle headless (hidden) browser mode so automation runs silently without opening a visible browser window.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon" style="background:rgba(234,179,8,.1)">🔐</div>
+      <h3>Session Persistence</h3>
+      <p>Login once — Playwright stores your Google session in a local profile so you never have to log in again.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon" style="background:rgba(255,0,0,.1)">💾</div>
+      <h3>Window State Memory</h3>
+      <p>Window position and size are auto-saved every 2 seconds so the app opens exactly where you left it.</p>
+    </div>
+
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- Usage -->
+<section id="usage">
+  <div class="section-label">How to use</div>
+  <h2 class="section-title">Get started in minutes</h2>
+  <p class="section-sub">Four simple steps to back up or restore your YouTube subscriptions.</p>
+  <div class="steps">
+
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <h3>Install the app</h3>
+        <p>Run the one-line PowerShell command. uv, Python, and Chromium are installed automatically — no prior setup needed.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <h3>Log in to Google <span class="tag tag-info">Once only</span></h3>
+        <p>Click <code>Login / Check Session</code> and complete the Google login in the browser window that opens. Your session is saved locally — you only need to do this once.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <h3>Export your subscriptions</h3>
+        <p>Click <code>Export (Backup)</code>. The app scrolls through your channel list and saves everything to <code>subscriptions.csv</code> in your app data folder.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <h3>Clear or Restore <span class="tag tag-warn">Irreversible without backup</span></h3>
+        <p>Use <code>Clear (Delete)</code> to mass-unsubscribe from all channels. Use <code>Import (Restore)</code> to re-subscribe from your CSV backup. Always export first!</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- Install -->
+<section id="install">
+  <div class="section-label">Installation</div>
+  <h2 class="section-title">One command, fully automated</h2>
+  <p class="section-sub">The installer handles everything — no Python, no manual dependencies.</p>
+
+  <div class="install-steps">
+    <div class="install-step">
+      <div class="install-step-icon">1️⃣</div>
+      <div>
+        <h4>Install uv (Python package manager)</h4>
+        <p>Auto-installed if not present. Manages Python itself so you don't have to.</p>
+      </div>
+    </div>
+    <div class="install-step">
+      <div class="install-step-icon">2️⃣</div>
+      <div>
+        <h4>Install Python 3.14</h4>
+        <p>Managed internally by uv — no system Python required.</p>
+      </div>
+    </div>
+    <div class="install-step">
+      <div class="install-step-icon">3️⃣</div>
+      <div>
+        <h4>Download &amp; verify the wheel</h4>
+        <p>Fetches the latest release from GitHub and verifies the blake3 hash for integrity.</p>
+      </div>
+    </div>
+    <div class="install-step">
+      <div class="install-step-icon">4️⃣</div>
+      <div>
+        <h4>Install the app &amp; Chromium</h4>
+        <p>Installs <code style="background:#222;color:#22c55e;padding:.1rem .35rem;border-radius:4px;font-size:.82rem">yt-subs</code> as a global tool and downloads Playwright's Chromium browser.</p>
+      </div>
+    </div>
+    <div class="install-step">
+      <div class="install-step-icon">5️⃣</div>
+      <div>
+        <h4>Create desktop shortcut</h4>
+        <p>A shortcut with the app icon is placed on your desktop automatically.</p>
+      </div>
+    </div>
+  </div>
+
+  <pre><span class="c-muted"># Windows PowerShell — run as any user, no admin required</span>
+<span class="c-yellow">irm</span> <span class="c-green">https://github.com/savvy773/app-yt-subs-manager/releases/latest/download/install.ps1</span> <span class="c-muted">|</span> <span class="c-yellow">iex</span>
+
+<span class="c-muted"># Linux / macOS</span>
+<span class="c-yellow">curl</span> <span class="c-blue">-fsSL</span> <span class="c-green">https://github.com/savvy773/app-yt-subs-manager/releases/latest/download/install.sh</span> <span class="c-muted">|</span> <span class="c-yellow">bash</span></pre>
+
+  <p style="margin-top:1rem;color:var(--muted);font-size:.875rem;">
+    Already installed? Running the command again will upgrade to the latest version and skip components that are already present.
+  </p>
+</section>
+
+<hr class="divider"/>
+
+<!-- Tech Specs -->
+<section id="specs">
+  <div class="section-label">Tech Specs</div>
+  <h2 class="section-title">Under the hood</h2>
+  <p class="section-sub">Built with modern Python tooling for reliability and easy distribution.</p>
+
+  <div class="spec-grid">
+
+    <div class="spec-card">
+      <div class="spec-card-header">
+        <span class="dot dot-blue"></span> Runtime &amp; Framework
+      </div>
+      <div class="spec-row"><span class="spec-key">Language</span>     <span class="spec-val">Python 3.14</span></div>
+      <div class="spec-row"><span class="spec-key">GUI Framework</span> <span class="spec-val">Flet 0.84 (Flutter)</span></div>
+      <div class="spec-row"><span class="spec-key">Automation</span>   <span class="spec-val">Playwright 1.58</span></div>
+      <div class="spec-row"><span class="spec-key">Browser</span>      <span class="spec-val">Chromium (bundled)</span></div>
+      <div class="spec-row"><span class="spec-key">Package Manager</span><span class="spec-val">uv</span></div>
+    </div>
+
+    <div class="spec-card">
+      <div class="spec-card-header">
+        <span class="dot dot-green"></span> Distribution
+      </div>
+      <div class="spec-row"><span class="spec-key">Format</span>         <span class="spec-val">Python Wheel (.whl)</span></div>
+      <div class="spec-row"><span class="spec-key">Integrity check</span><span class="spec-val">BLAKE3 hash</span></div>
+      <div class="spec-row"><span class="spec-key">Installer</span>      <span class="spec-val">PowerShell / Bash</span></div>
+      <div class="spec-row"><span class="spec-key">Registry</span>       <span class="spec-val">GitHub Releases</span></div>
+      <div class="spec-row"><span class="spec-key">Entry point type</span><span class="spec-val">gui-scripts (no console)</span></div>
+    </div>
+
+    <div class="spec-card">
+      <div class="spec-card-header">
+        <span class="dot dot-yellow"></span> Platform Support
+      </div>
+      <div class="spec-row"><span class="spec-key">Windows</span>  <span class="spec-val" style="color:var(--green)">✓ Supported</span></div>
+      <div class="spec-row"><span class="spec-key">macOS</span>    <span class="spec-val" style="color:var(--green)">✓ Supported</span></div>
+      <div class="spec-row"><span class="spec-key">Linux</span>    <span class="spec-val" style="color:var(--green)">✓ Supported</span></div>
+      <div class="spec-row"><span class="spec-key">Admin rights</span><span class="spec-val" style="color:var(--green)">Not required</span></div>
+      <div class="spec-row"><span class="spec-key">Python required</span><span class="spec-val" style="color:var(--green)">Not required</span></div>
+    </div>
+
+    <div class="spec-card">
+      <div class="spec-card-header">
+        <span class="dot dot-red"></span> Data &amp; Privacy
+      </div>
+      <div class="spec-row"><span class="spec-key">Config path</span>   <span class="spec-val">%APPDATA%\yt-subs\</span></div>
+      <div class="spec-row"><span class="spec-key">Session storage</span><span class="spec-val">Local Chromium profile</span></div>
+      <div class="spec-row"><span class="spec-key">Network calls</span> <span class="spec-val">YouTube only</span></div>
+      <div class="spec-row"><span class="spec-key">Telemetry</span>     <span class="spec-val" style="color:var(--green)">None</span></div>
+      <div class="spec-row"><span class="spec-key">Source</span>        <span class="spec-val">100% open source</span></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <p>© 2026 <a href="https://github.com/savvy773" target="_blank">savvy773</a> · Licensed under Apache 2.0 ·
+  <a href="https://github.com/savvy773/app-yt-subs-manager" target="_blank">GitHub</a></p>
+</footer>
+
+<script>
+  function copyCmd() {
+    const cmd = document.getElementById('install-cmd').textContent;
+    navigator.clipboard.writeText(cmd).then(() => {
+      const btn = document.querySelector('.copy-btn');
+      btn.textContent = 'Copied!';
+      btn.style.color = '#22c55e';
+      setTimeout(() => { btn.textContent = 'Copy'; btn.style.color = ''; }, 2000);
+    });
+  }
+</script>
+
+</body>
+</html>
