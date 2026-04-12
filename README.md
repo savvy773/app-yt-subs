@@ -1,26 +1,27 @@
 # YouTube Subscriptions Manager
 
+> Backup, clean, and restore your YouTube subscriptions — safely and automatically.
+
 ![App Screenshot](images/screenshot.png)
 
-A GUI tool to **backup, clear, and restore** your YouTube subscriptions — safely and automatically.
-Built with Playwright (browser automation) and Flet (desktop GUI).
+---
+
+## ✨ Features
+
+| | Feature | Description |
+|---|---------|-------------|
+| 📥 | **Export** | Saves all subscribed channels to `subscriptions.csv` |
+| 🗑️ | **Clear** | Mass unsubscribe with a confirmation prompt |
+| 📤 | **Import** | Re-subscribes from a CSV backup |
+| 🛡️ | **Safe Mode** | Human-like random delays to avoid account flags |
+| 🕶️ | **Background Mode** | Runs the browser hidden |
+| 🔑 | **Session Persistence** | Stays logged in after the first sign-in |
 
 ---
 
-## Features
+## 📦 Installation
 
-- **Export (Backup)** — saves all subscribed channels to `subscriptions.csv`
-- **Clear (Unsubscribe)** — mass unsubscribe with a confirmation prompt
-- **Import (Restore)** — re-subscribes from a CSV backup file
-- **Safe Mode** — human-like random delays to avoid YouTube account flags
-- **Background Mode** — runs the browser hidden while you do other things
-- **Session Persistence** — stays logged in after the first sign-in
-
----
-
-## Installation
-
-> No Python or Git required. The installer handles everything.
+> **No Python or Git required.** The installer handles everything automatically.
 
 **Windows** — open PowerShell and run:
 
@@ -34,73 +35,109 @@ irm https://github.com/savvy773/app-yt-subs-manager/releases/latest/download/ins
 curl -fsSL https://github.com/savvy773/app-yt-subs-manager/releases/latest/download/install.sh | bash
 ```
 
-What the installer does, step by step:
+<details>
+<summary>What does the installer actually do?</summary>
 
-1. Installs **uv** (a fast Python package manager) if not already present
-2. Installs the latest **Python** via uv — no system Python needed
-3. Downloads the app package (`.whl`) from GitHub Releases
-4. Verifies the download with a **Blake3** checksum to ensure integrity
-5. Installs the app with `uv tool install`
-6. Installs the **Chromium** browser required for automation
+```
+ 1. Install uv          — fast Python package manager (if not present)
+ 2. Install Python      — managed by uv, no system Python needed
+ 3. Download .whl       — app package from GitHub Releases
+ 4. Verify Blake3       — checksum check to ensure the file is intact
+ 5. uv tool install     — installs the app in an isolated environment
+ 6. playwright install  — downloads the Chromium browser for automation
+```
+
+</details>
 
 ---
 
-## Usage
-
-After installation, launch the app from any terminal:
+## 🚀 Workflow
 
 ```
+┌─────────────────────────────────────────────────────┐
+│                  First-time Setup                   │
+│                                                     │
+│   $ yt-subs                                         │
+│        │                                            │
+│        ▼                                            │
+│   Click "Login / Check Session"                     │
+│        │                                            │
+│        ▼                                            │
+│   Browser opens → Sign in to Google manually        │
+│        │                                            │
+│        ▼                                            │
+│   Session saved to user_data/ ✅                    │
+└─────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────┐
+│                Backup & Restore Flow                 │
+│                                                      │
+│   📥 Export          📤 Import                       │
+│   ────────           ────────                        │
+│   Open YouTube  →    Read subscriptions.csv          │
+│   Scroll page   →    Visit each channel URL          │
+│   Scrape names  →    Click Subscribe                 │
+│   Save CSV      →    Done ✅                         │
+└──────────────────────────────────────────────────────┘
+```
+
+---
+
+## 🖥️ Usage
+
+Launch from any terminal after installation:
+
+```sh
 yt-subs
 ```
 
-**First run:**
+### Step 1 — Authenticate
 
-1. Click **Login / Check Session** — a browser window opens
-2. Sign in to your Google account manually
-3. Close the browser — your session is saved for future runs
+Click **Login / Check Session**.
+A browser window opens — sign in once, and the session is saved for all future runs.
 
-**Main operations:**
+### Step 2 — Choose an action
 
-| Button | What it does |
-|--------|--------------|
-| Export (Backup) | Scrolls your subscriptions page and saves all channels to `subscriptions.csv` |
-| Clear (Delete) | Unsubscribes from every channel — shows a confirmation dialog first |
-| Import (Restore) | Opens each channel URL from `subscriptions.csv` and subscribes |
+| Button | Action | Est. Time (200 channels) |
+|--------|--------|--------------------------|
+| 📥 Export | Scroll & scrape all subscriptions → CSV | ~5 min |
+| 🗑️ Clear | Unsubscribe from all channels (confirm first) | ~30 min |
+| 📤 Import | Re-subscribe from CSV | ~20 min |
 
-**Tips:**
+### Tips
 
-- Enable **Background Mode** after your first login to run without a visible browser window
-- Safe Mode delays are intentional — do not close the app mid-operation
-- For 200+ channels, export and import each take roughly 20–30 minutes
-
----
-
-## Files created locally
-
-| File / Folder | Description |
-|---------------|-------------|
-| `subscriptions.csv` | Your channel backup — keep this safe |
-| `config.json` | Window position/size (auto-generated) |
-| `user_data/` | Google session data — **never share or upload this** |
+- ✅ Enable **Background Mode** after first login to run silently
+- ⏳ Delays are intentional — do **not** close the app mid-operation
+- 🔁 Run **Export first** before Clear, so you can always restore
 
 ---
 
-## Uninstall
+## 📂 Local Files
 
 ```
+your-working-directory/
+├── subscriptions.csv   ← your channel backup (keep this safe!)
+├── config.json         ← window position/size (auto-generated)
+└── user_data/          ← Google session (⚠️ never share this)
+```
+
+---
+
+## 🗑️ Uninstall
+
+```sh
 uv tool uninstall yt-subs
 ```
 
 ---
 
-## Disclaimer
+## ⚠️ Disclaimer
 
 This tool automates actions on YouTube, which may conflict with YouTube's Terms of Service.
-Use it at your own risk. The author is not responsible for any account restrictions or bans.
-The `user_data` folder contains your active Google session — treat it like a password.
+Use it at your own risk. The `user_data/` folder contains your active Google session — treat it like a password and never share it.
 
 ---
 
-## License
+## 📄 License
 
-Apache 2.0 — see [LICENSE](LICENSE) for details.
+[Apache 2.0](LICENSE) © 2026 savvy773
