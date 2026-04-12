@@ -25,9 +25,8 @@ subscriptions.csv
 config.json
 
 
-# Scripts (Local only)
-scripts/
-
+# PyInstaller (no longer used)
+.pyinstaller/
 
 # Logs & Temp files
 *.log
