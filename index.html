@@ -6,17 +6,18 @@
   <title>YT Subs Manager</title>
   <style>
     :root {
-      --bg:        #0d0d0d;
-      --surface:   #141414;
-      --card:      #1a1a1a;
-      --border:    #2a2a2a;
-      --accent:    #eb2525;
-      --accent2:   #db5656;
-      --text:      #f0f0f0;
-      --muted:     #888;
-      --green:     #22c55e;
-      --blue:      #3b82f6;
-      --yellow:    #eab308;
+      --bg:        #171012;
+      --surface:   #1d1417;
+      --card:      #24191c;
+      --border:    #392a2e;
+      --accent:    #e8877c;
+      --accent2:   #f0ac9f;
+      --text:      #f3e9ea;
+      --muted:     #a58f93;
+      --green:     #8fd8ac;
+      --blue:      #8db8f0;
+      --yellow:    #f0d189;
+      --purple:    #c4a8f0;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -33,7 +34,7 @@
       position: sticky;
       top: 0;
       z-index: 100;
-      background: rgba(13,13,13,0.85);
+      background: color-mix(in srgb, var(--bg) 85%, transparent);
       backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
       padding: 0 2rem;
@@ -77,15 +78,15 @@
       content: '';
       position: absolute;
       inset: 0;
-      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255,0,0,.12) 0%, transparent 70%);
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, color-mix(in srgb, var(--accent) 14%, transparent) 0%, transparent 70%);
       pointer-events: none;
     }
     .badge {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: rgba(255,0,0,.1);
-      border: 1px solid rgba(255,0,0,.25);
+      background: color-mix(in srgb, var(--accent) 12%, transparent);
+      border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
       color: var(--accent2);
       font-size: .78rem;
       font-weight: 600;
@@ -181,7 +182,7 @@
       transition: all .2s;
       white-space: nowrap;
     }
-    .copy-btn:hover { background: #333; color: var(--text); }
+    .copy-btn:hover { background: var(--border); color: var(--text); }
 
     /* ── Section ── */
     section { padding: 5rem 2rem; max-width: 1100px; margin: 0 auto; }
@@ -219,7 +220,7 @@
       padding: 1.75rem;
       transition: border-color .2s, transform .2s;
     }
-    .feature-card:hover { border-color: #444; transform: translateY(-2px); }
+    .feature-card:hover { border-color: var(--muted); transform: translateY(-2px); }
     .feature-icon {
       width: 44px;
       height: 44px;
@@ -245,13 +246,13 @@
       align-items: flex-start;
       transition: border-color .2s;
     }
-    .step:hover { border-color: #444; }
+    .step:hover { border-color: var(--muted); }
     .step-num {
       min-width: 36px;
       height: 36px;
       border-radius: 50%;
-      background: rgba(255,0,0,.12);
-      border: 1px solid rgba(255,0,0,.25);
+      background: color-mix(in srgb, var(--accent) 12%, transparent);
+      border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
       color: var(--accent2);
       font-weight: 800;
       font-size: .9rem;
@@ -263,7 +264,7 @@
     .step-content h3 { font-size: 1rem; font-weight: 700; margin-bottom: .35rem; }
     .step-content p  { color: var(--muted); font-size: .9rem; }
     .step-content code {
-      background: #222;
+      background: var(--card);
       color: var(--green);
       padding: .15rem .45rem;
       border-radius: 4px;
@@ -279,8 +280,8 @@
       margin-left: .5rem;
       vertical-align: middle;
     }
-    .tag-warn { background: rgba(234,179,8,.15); color: var(--yellow); }
-    .tag-info { background: rgba(59,130,246,.15); color: var(--blue); }
+    .tag-warn { background: color-mix(in srgb, var(--yellow) 16%, transparent); color: var(--yellow); }
+    .tag-info { background: color-mix(in srgb, var(--blue) 16%, transparent); color: var(--blue); }
 
     /* ── Tech spec table ── */
     .spec-grid {
@@ -312,7 +313,7 @@
       justify-content: space-between;
       align-items: center;
       padding: .85rem 1.5rem;
-      border-bottom: 1px solid #1f1f1f;
+      border-bottom: 1px solid var(--border);
       font-size: .9rem;
     }
     .spec-row:last-child { border-bottom: none; }
@@ -345,7 +346,7 @@
     .install-step h4 { font-size: .95rem; font-weight: 700; }
 
     pre {
-      background: #0a0a0a;
+      background: var(--bg);
       border: 1px solid var(--border);
       border-radius: 10px;
       padding: 1.25rem 1.5rem;
@@ -435,37 +436,37 @@
   <div class="features-grid">
 
     <div class="feature-card">
-      <div class="feature-icon" style="background:rgba(34,197,94,.1)">📤</div>
+      <div class="feature-icon" style="background:color-mix(in srgb, var(--green) 14%, transparent)">📤</div>
       <h3>Export (Backup)</h3>
-      <p>Scrapes all your subscribed channels and saves them to a <code style="background:#222;color:#22c55e;padding:.1rem .35rem;border-radius:4px;font-size:.82rem">subscriptions.csv</code> file for safekeeping.</p>
+      <p>Scrapes all your subscribed channels and saves them to a <code style="background:var(--card);color:var(--green);padding:.1rem .35rem;border-radius:4px;font-size:.82rem">subscriptions.csv</code> file for safekeeping.</p>
     </div>
 
     <div class="feature-card">
-      <div class="feature-icon" style="background:rgba(239,68,68,.1)">🗑️</div>
+      <div class="feature-icon" style="background:color-mix(in srgb, var(--accent) 14%, transparent)">🗑️</div>
       <h3>Clear (Bulk Unsubscribe)</h3>
       <p>Automatically unsubscribes from every channel with human-like delays and periodic safe-breaks to avoid account flags.</p>
     </div>
 
     <div class="feature-card">
-      <div class="feature-icon" style="background:rgba(59,130,246,.1)">📥</div>
+      <div class="feature-icon" style="background:color-mix(in srgb, var(--blue) 14%, transparent)">📥</div>
       <h3>Import (Restore)</h3>
       <p>Re-subscribes to all channels in your CSV backup with progress tracking and per-channel status logging.</p>
     </div>
 
     <div class="feature-card">
-      <div class="feature-icon" style="background:rgba(168,85,247,.1)">🕶️</div>
+      <div class="feature-icon" style="background:color-mix(in srgb, var(--purple) 14%, transparent)">🕶️</div>
       <h3>Background Mode</h3>
       <p>Toggle headless (hidden) browser mode so automation runs silently without opening a visible browser window.</p>
     </div>
 
     <div class="feature-card">
-      <div class="feature-icon" style="background:rgba(234,179,8,.1)">🔐</div>
+      <div class="feature-icon" style="background:color-mix(in srgb, var(--yellow) 14%, transparent)">🔐</div>
       <h3>Session Persistence</h3>
       <p>Login once — Playwright stores your Google session in a local profile so you never have to log in again.</p>
     </div>
 
     <div class="feature-card">
-      <div class="feature-icon" style="background:rgba(255,0,0,.1)">💾</div>
+      <div class="feature-icon" style="background:color-mix(in srgb, var(--accent2) 16%, transparent)">💾</div>
       <h3>Window State Memory</h3>
       <p>Window position and size are auto-saved every 2 seconds so the app opens exactly where you left it.</p>
     </div>
@@ -551,7 +552,7 @@
       <div class="install-step-icon">4️⃣</div>
       <div>
         <h4>Install the app &amp; Chromium</h4>
-        <p>Installs <code style="background:#222;color:#22c55e;padding:.1rem .35rem;border-radius:4px;font-size:.82rem">yt-subs</code> as a global tool and downloads Playwright's Chromium browser.</p>
+        <p>Installs <code style="background:var(--card);color:var(--green);padding:.1rem .35rem;border-radius:4px;font-size:.82rem">yt-subs</code> as a global tool and downloads Playwright's Chromium browser.</p>
       </div>
     </div>
     <div class="install-step">
@@ -643,7 +644,7 @@
     navigator.clipboard.writeText(cmd).then(() => {
       const btn = document.querySelector('.copy-btn');
       btn.textContent = 'Copied!';
-      btn.style.color = '#22c55e';
+      btn.style.color = 'var(--green)';
       setTimeout(() => { btn.textContent = 'Copy'; btn.style.color = ''; }, 2000);
     });
   }
